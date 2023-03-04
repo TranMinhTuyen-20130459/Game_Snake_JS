@@ -1,4 +1,4 @@
-$color-left-right : #174d3b;
+$color-left-right: #174d3b;
 
 body {
   font-family: Arial;
@@ -6,7 +6,7 @@ body {
 
 .container {
   width: 1200px;
-  height: 520px;
+  height: 500px;
   margin: 30px auto;
   display: flex;
   justify-content: space-between;
@@ -25,5 +25,23 @@ body {
 .right-game {
   flex: 0.5;
   background-color: $color-left-right;
+
+  color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .content-right {
+    font-size: 35px;
+
+    h1 {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+}
+
+#canvas-game {
 
 }
