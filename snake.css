@@ -1,10 +1,11 @@
+@charset "UTF-8";
 body {
   font-family: Arial;
 }
 
 .container {
   width: 1200px;
-  height: 500px;
+  height: 510px;
   margin: 30px auto;
   display: flex;
   justify-content: space-between;
@@ -13,16 +14,34 @@ body {
 
 .left-game {
   flex: 0.5;
-  background-color: #174d3b;
+  background-color: #203c5b;
+}
+.left-game .level-game {
+  width: 80%;
+  height: 40px;
+  margin: 40px auto;
+  background-color: rgb(10, 10, 10);
+  box-sizing: border-box;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: antiquewhite;
+}
+.left-game .level-game:hover {
+  background-color: #a10f43;
+  cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
 }
 
 .main-game {
   flex: 1;
+  border: 5px solid #1b9b78;
 }
 
 .right-game {
   flex: 0.5;
-  background-color: #174d3b;
+  background-color: #203c5b;
   color: red;
   display: flex;
   justify-content: center;

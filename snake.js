@@ -36,9 +36,9 @@ class Snake {
         this.COLOR_BODY_SNAKE = 'white';
 
         this.bodySnake = [
-            new Vector2D(BLOCK_SIZE * 5, BLOCK_SIZE * 4),
             new Vector2D(BLOCK_SIZE * 6, BLOCK_SIZE * 4),
-            new Vector2D(BLOCK_SIZE * 7, BLOCK_SIZE * 4)
+            new Vector2D(BLOCK_SIZE * 7, BLOCK_SIZE * 4),
+            new Vector2D(BLOCK_SIZE * 8, BLOCK_SIZE * 4)
         ];
 
         currentDirectionSnake = new Vector2D(-1, 0);
@@ -137,7 +137,7 @@ class Snake {
 
         if (gameOverLevel1 === true) {
             clearInterval(intervalLevel1);
-            console.log("Game over");
+            alert("Game over");
             gameOverLevel1 = false;
         }
 
@@ -206,86 +206,49 @@ class GameSnakeLevel1 {
 
 let gameLevel1 = new GameSnakeLevel1()
 
-// Gán sự kiện onclick cho canvas
-canvas.onclick = function (e) {
-    let rect = canvas.getBoundingClientRect();
-    let mouseX = e.clientX - rect.left;
-    let mouseY = e.clientY - rect.top;
-    if (isInsideButton(mouseX, mouseY)) {
-        context.fillStyle = COLOR_BACKGROUND;
-        context.fillRect(button.x, button.y, button.w, button.h);
-
-        intervalLevel1 = setInterval(function () {
-            snake.moveSnake();
-            if (snake.checkEatFood(food)) {
-                score++;
-                food.drawFood();
-                snake.growUp();
-                let scoreElements = document.getElementsByClassName('score');
-                for (let element of scoreElements) {
-                    element.innerHTML = score;
-                }
-            }
-        }, 200) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
-
-        document.onkeydown = function (e) {
-            switch (e.keyCode) {
-                case LEFT:
-                    if (currentDirectionSnake.x === 1) break; // -> không cho phép con rắn được được đổi hướng sang bên phải
-                    currentDirectionSnake = new Vector2D(-1, 0);
-                    break;
-                case RIGHT:
-                    if (currentDirectionSnake.x === -1) break;  // -> không cho phép con rắn được được đổi hướng sang bên trái
-                    currentDirectionSnake = new Vector2D(1, 0)
-                    break;
-                case UP:
-                    if (currentDirectionSnake.y === 1) break;  // -> không cho phép con rắn được được đổi hướng xuống dưới
-                    currentDirectionSnake = new Vector2D(0, -1)
-                    break;
-                case DOWN:
-                    if (currentDirectionSnake.y === -1) break;  // -> không cho phép con rắn được được đổi hướng lên trên
-                    currentDirectionSnake = new Vector2D(0, 1)
-                    break;
-                default:
-                    break;
-            }
-            //  console.log(e.keyCode)
-        } // -> xử lí sự kiện khi con rắn di chuyển
-
-    }
+canvas.onclick = function () {
+    runLevel1();
 }
 
-// Tạo một đối tượng button
-let button = {
-    x: WIDTH_GAME / 3, // Tọa độ x của button
-    y: HEIGHT_GAME / 2.5, // Tọa độ y của button
-    w: 200, // Chiều rộng của button
-    h: 50, // Chiều cao của button
-    text: "Play", // Văn bản hiển thị trên button
-};
+function runLevel1() {
 
-function drawButton() {
-    // Vẽ hình chữ nhật cho button
-    context.fillStyle = "blue"; // Màu nền của button
-    context.fillRect(button.x, button.y, button.w, button.h); // Vị trí và kích thước của button
+    intervalLevel1 = setInterval(function () {
+        snake.moveSnake();
+        if (snake.checkEatFood(food)) {
+            score++;
+            food.drawFood();
+            snake.growUp();
+            let scoreElements = document.getElementsByClassName('score');
+            for (let element of scoreElements) {
+                element.innerHTML = score;
+            }
+        }
+    }, 200) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
 
-    // Vẽ văn bản cho button
-    context.fillStyle = "white"; // Màu chữ của văn bản
-    context.font = "30px Arial"; // Font chữ của văn bản
-    let textWidth = context.measureText(button.text).width; // Đo chiều rộng của văn bản để căn giữa
-    let textX = button.x + (button.w - textWidth) / 2; // Tọa độ x của văn bản để căn giữa trong hình chữ nhật
-    let textY = button.y + (button.h + 30) / 2; // Tọa độ y của văn bản để căn giữa trong hình chữ nhật
-    context.fillText(button.text, textX, textY);
-}  // Hàm để vẽ button lên canvas
-
-drawButton(); // Gọi hàm drawButton để vẽ button Play
-
-function isInsideButton(x, y) {
-    return x >= button.x && x <= button.x + button.w && y >= button.y && y <= button.y + button.h;
-} // Hàm để kiểm tra xem tọa độ chuột có nằm trong khu vực của button hay không ?
-
-
-
+    document.onkeydown = function (e) {
+        switch (e.keyCode) {
+            case LEFT:
+                if (currentDirectionSnake.x === 1) break; // -> không cho phép con rắn được được đổi hướng sang bên phải
+                currentDirectionSnake = new Vector2D(-1, 0);
+                break;
+            case RIGHT:
+                if (currentDirectionSnake.x === -1) break;  // -> không cho phép con rắn được được đổi hướng sang bên trái
+                currentDirectionSnake = new Vector2D(1, 0)
+                break;
+            case UP:
+                if (currentDirectionSnake.y === 1) break;  // -> không cho phép con rắn được được đổi hướng xuống dưới
+                currentDirectionSnake = new Vector2D(0, -1)
+                break;
+            case DOWN:
+                if (currentDirectionSnake.y === -1) break;  // -> không cho phép con rắn được được đổi hướng lên trên
+                currentDirectionSnake = new Vector2D(0, 1)
+                break;
+            default:
+                break;
+        }
+        //  console.log(e.keyCode)
+    } // -> xử lí sự kiện khi con rắn di chuyển
+}
 
 
 
