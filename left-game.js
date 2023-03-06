@@ -46,3 +46,14 @@ for (let div of divs) {
     }
 
 }
+
+// Chọn ra phần tử có id là play-div
+let playDiv = document.getElementById("play-div");
+
+// thêm sự kiện cho phần tử có id là play-div
+playDiv.addEventListener("click", function () {
+
+    playDiv.style.display = "none"; // -> ẩn phần tử
+    runLevel1();
+
+});

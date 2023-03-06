@@ -212,6 +212,8 @@ canvas.onclick = function () {
 
 function runLevel1() {
 
+    playDiv.style.display = "none";
+
     intervalLevel1 = setInterval(function () {
         snake.moveSnake();
         if (snake.checkEatFood(food)) {
