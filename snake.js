@@ -19,8 +19,17 @@ let snake;
 let food;
 let currentDirectionSnake; // hướng hiện tại của con rắn hệ trục tọa độ x,y
 let score = 0;
-let gameOverLevel1 = false;
-let intervalLevel1;
+let gameLevel;
+let intervalLevel;
+let gameOverLevel = false;
+let TIME_OUT_LEVEL_2 = 200;
+
+let isRunLevel1 = false; // biến kiểm soát Game có đang chạy ở Level 1 hay không ?
+let isRunLevel2 = false; // biến kiểm soát Game có đang chạy ở Level 2 hay không ?
+let isRunLevel3 = false; // biến kiểm soát Game có đang chạy ở Level 3 hay không ?
+let isRunLevel4 = false; // biến kiểm soát Game có đang chạy ở Level 4 hay không ?
+let isRunLevel5 = false; // biến kiểm soát Game có đang chạy ở Level 5 hay không ?
+let isRunLevel6 = false; // biến kiểm soát Game có đang chạy ở Level 6 hay không ?
 
 class Vector2D {
     constructor(x, y) {
@@ -30,15 +39,15 @@ class Vector2D {
 }
 
 class Snake {
-    constructor() {
+    constructor(x1, x2, x3, y) {
 
         this.COLOR_HEAD_SNAKE = 'green';
         this.COLOR_BODY_SNAKE = 'white';
 
         this.bodySnake = [
-            new Vector2D(BLOCK_SIZE * 6, BLOCK_SIZE * 4),
-            new Vector2D(BLOCK_SIZE * 7, BLOCK_SIZE * 4),
-            new Vector2D(BLOCK_SIZE * 8, BLOCK_SIZE * 4)
+            new Vector2D(BLOCK_SIZE * x1, BLOCK_SIZE * y),
+            new Vector2D(BLOCK_SIZE * x2, BLOCK_SIZE * y),
+            new Vector2D(BLOCK_SIZE * x3, BLOCK_SIZE * y)
         ];
 
         currentDirectionSnake = new Vector2D(-1, 0);
@@ -77,7 +86,7 @@ class Snake {
 
     }
 
-    moveSnake() {
+    moveSnake1() {
 
         /*
          khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
@@ -93,16 +102,50 @@ class Snake {
         this.bodySnake[0].x += currentDirectionSnake.x * BLOCK_SIZE;
         this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
 
-        this.evenWhenTouchBody(); // kiểm tra con rắn có chạm vào thân của nó hay không ?
-        this.eventWhenTouchEdge();
+        this.evenWhenTouchBody(); // sự kiện khi con rắn chạm vào thân của nó
+        this.eventWhenTouchEdge(); // sự kiện khi con rắn chạm vào các cạnh của màn hình chơi game
         this.drawSnake();
 
-    }
+    } // -> con rắn tự động di chuyển ở Level 1
+
+    moveSnake2() {
+
+        /*
+         khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
+         */
+
+        this.clearSnake();
+
+        for (let i = this.bodySnake.length - 1; i > 0; i--) {
+            this.bodySnake[i].x = this.bodySnake[i - 1].x;
+            this.bodySnake[i].y = this.bodySnake[i - 1].y;
+        }
+
+        this.bodySnake[0].x += currentDirectionSnake.x * BLOCK_SIZE;
+        this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
+
+        if (this.checkTouchEdge() === true) {
+            clearInterval(intervalLevel);
+            alert('Game over');
+        }
+        this.evenWhenTouchBody();
+        this.drawSnake();
+
+    } // -> con rắn tự động di chuyển ở Level 2
 
     checkEatFood(food) {
         let headSnake = this.bodySnake[0];
         return food.x === headSnake.x && food.y === headSnake.y;
-    }
+    } // -> kiểm tra rắn đã ăn mồi thành công hay chưa ?
+
+    checkTouchEdge() {
+
+        let headSnake = this.bodySnake[0];
+        if (headSnake.x === -BLOCK_SIZE || headSnake.x === WIDTH_GAME || headSnake.y === -BLOCK_SIZE || headSnake.y === HEIGHT_GAME)
+            return true;
+        return false;
+
+    } // -> kiểm tra con rắn có đụng tường hay không ?
 
     eventWhenTouchEdge() {
 
@@ -129,16 +172,16 @@ class Snake {
 
             let body = this.bodySnake[i];
             if ((headSnake.x === body.x) && (headSnake.y === body.y)) {
-                gameOverLevel1 = true;
+                gameOverLevel = true;
                 break;
             }
 
         }
 
-        if (gameOverLevel1 === true) {
-            clearInterval(intervalLevel1);
+        if (gameOverLevel === true) {
+            clearInterval(intervalLevel);
             alert("Game over");
-            gameOverLevel1 = false;
+            gameOverLevel = false;
         }
 
     }  // -> đây là hàm xử lí khi con rắn chạm vào thân của mình
@@ -173,6 +216,7 @@ class Food {
          hàm Math.floor() sẽ làm tròn số -> trả về số nguyên gần nhất nhỏ hơn số truyền vào
          hàm Math.random() sẽ random ra các con số từ 0 - 1
          */
+
         this.x = Math.floor(Math.random() * cols) * BLOCK_SIZE;
         this.y = Math.floor(Math.random() * rows) * BLOCK_SIZE;
 
@@ -196,7 +240,7 @@ class Food {
 class GameSnakeLevel1 {
 
     constructor() {
-        snake = new Snake();
+        snake = new Snake(7,8,9,5);
         food = new Food(0, 0);
         snake.drawSnake()
         food.drawFood()
@@ -204,28 +248,72 @@ class GameSnakeLevel1 {
 
 }
 
-let gameLevel1 = new GameSnakeLevel1()
+class GameSnakeLevel2 {
 
-canvas.onclick = function () {
-    runLevel1();
+    constructor() {
+        snake = new Snake(10,11,12,10);
+        food = new Food(0, 0);
+        snake.drawSnake()
+        food.drawFood()
+    }
+
+
 }
 
 function runLevel1() {
 
-    playDiv.style.display = "none";
+    if (isRunLevel1 === false) { //-> nếu function này chưa được thực thi
 
-    intervalLevel1 = setInterval(function () {
-        snake.moveSnake();
-        if (snake.checkEatFood(food)) {
-            score++;
-            food.drawFood();
-            snake.growUp();
-            let scoreElements = document.getElementsByClassName('score');
-            for (let element of scoreElements) {
-                element.innerHTML = score;
+        playDiv.style.display = "none"; // -> ẩn đi phần tử
+
+        intervalLevel = setInterval(function () {
+            snake.moveSnake1();
+            if (snake.checkEatFood(food)) {
+                score++;
+                food.drawFood();
+                snake.growUp();
+                let scoreElements = document.getElementsByClassName('score');
+                for (let element of scoreElements) {
+                    element.innerHTML = score;
+                }
             }
-        }
-    }, 200) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
+        }, 200) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
+
+        keyBoardGame();
+
+        isRunLevel1 = true; // -> đánh dấu function này đã được thực thi
+
+    }
+
+}
+
+function runLevel2() {
+
+    if (isRunLevel2 === false) {
+
+        playDiv.style.display = "none"; // -> ẩn đi phần tử
+
+        intervalLevel = setInterval(function () {
+            snake.moveSnake2();
+            if (snake.checkEatFood(food)) {
+                score++;
+                food.drawFood();
+                snake.growUp();
+                let scoreElements = document.getElementsByClassName('score');
+                for (let element of scoreElements) {
+                    element.innerHTML = score;
+                }
+            }
+            TIME_OUT_LEVEL_2 -= 5;
+        }, TIME_OUT_LEVEL_2);
+
+        keyBoardGame();
+
+        isRunLevel2 = true;
+    }
+}
+
+function keyBoardGame() {
 
     document.onkeydown = function (e) {
         switch (e.keyCode) {
@@ -250,7 +338,10 @@ function runLevel1() {
         }
         //  console.log(e.keyCode)
     } // -> xử lí sự kiện khi con rắn di chuyển
+
 }
+
+
 
 
 

@@ -1,6 +1,8 @@
 @charset "UTF-8";
+/* Màu áp dụng cho thẻ div ở bên trái và bên phải của game */
 body {
   font-family: Arial;
+  cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
 }
 
 .container {
@@ -31,7 +33,6 @@ body {
 }
 .left-game .level-game:hover {
   background-color: #a10f43;
-  cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
 }
 
 .main-game {

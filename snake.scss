@@ -1,7 +1,10 @@
-$color-left-right: #203c5b;
+
+$color-left-right: #203c5b; /* Màu áp dụng cho thẻ div ở bên trái và bên phải của game */
+$pink-color: #a10f43;
 
 body {
   font-family: Arial;
+  cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
 }
 
 .container {
@@ -32,8 +35,7 @@ body {
   }
 
   .level-game:hover {
-    background-color: #a10f43;
-    cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
+    background-color: $pink-color;
   }
 
 }
@@ -89,8 +91,9 @@ body {
 
   width: 200px;
   height: 50px;
-  background-color: #a10f43;
+  background-color: $pink-color;
   border-radius: 20px;
 
   color: antiquewhite;
 }
+
