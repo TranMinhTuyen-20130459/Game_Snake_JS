@@ -7,6 +7,8 @@ const canvas = document.getElementById('canvas-game');
 canvas.width = WIDTH_GAME , canvas.height = HEIGHT_GAME;
 
 const COLOR_BACKGROUND = 'black';
+const COLOR_FOOD = 'yellow';
+
 const context = canvas.getContext('2d');
 context.fillStyle = COLOR_BACKGROUND
 context.fillRect(0, 0, WIDTH_GAME, HEIGHT_GAME);
@@ -15,6 +17,7 @@ const LEFT = 37;
 const RIGHT = 39;
 const UP = 38;
 const DOWN = 40;
+
 let snake;
 let food;
 let currentDirectionSnake; // hướng hiện tại của con rắn hệ trục tọa độ x,y
@@ -97,14 +100,14 @@ class Snake {
         for (let i = this.bodySnake.length - 1; i > 0; i--) {
             this.bodySnake[i].x = this.bodySnake[i - 1].x;
             this.bodySnake[i].y = this.bodySnake[i - 1].y;
-        }
+        } // -> tọa độ từng phần của con rắn sẽ bằng tọa độ của phần trước đó
 
         this.bodySnake[0].x += currentDirectionSnake.x * BLOCK_SIZE;
         this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
 
-        this.evenWhenTouchBody(); // sự kiện khi con rắn chạm vào thân của nó
-        this.eventWhenTouchEdge(); // sự kiện khi con rắn chạm vào các cạnh của màn hình chơi game
         this.drawSnake();
+        this.evenWhenTouchBody(); // sự kiện khi con rắn chạm vào thân của nó
+        this.eventWhenTouchEdge1(); // sự kiện khi con rắn chạm vào các cạnh của màn hình chơi game
 
     } // -> con rắn tự động di chuyển ở Level 1
 
@@ -124,30 +127,17 @@ class Snake {
         this.bodySnake[0].x += currentDirectionSnake.x * BLOCK_SIZE;
         this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
 
-        if (this.checkTouchEdge() === true) {
-            clearInterval(intervalLevel);
-            alert('Game over');
-        }
-        this.evenWhenTouchBody();
         this.drawSnake();
+        this.evenWhenTouchBody();
+        this.eventWhenTouchEdge2();
+
+        if (this.checkTouchWall2()) {
+            gameOver();
+        }
 
     } // -> con rắn tự động di chuyển ở Level 2
 
-    checkEatFood(food) {
-        let headSnake = this.bodySnake[0];
-        return food.x === headSnake.x && food.y === headSnake.y;
-    } // -> kiểm tra rắn đã ăn mồi thành công hay chưa ?
-
-    checkTouchEdge() {
-
-        let headSnake = this.bodySnake[0];
-        if (headSnake.x === -BLOCK_SIZE || headSnake.x === WIDTH_GAME || headSnake.y === -BLOCK_SIZE || headSnake.y === HEIGHT_GAME)
-            return true;
-        return false;
-
-    } // -> kiểm tra con rắn có đụng tường hay không ?
-
-    eventWhenTouchEdge() {
+    eventWhenTouchEdge1() {
 
         let headSnake = this.bodySnake[0];
         if (headSnake.x < 0) {
@@ -162,7 +152,32 @@ class Snake {
         if (headSnake.y > HEIGHT_GAME) {
             headSnake.y = 0;
         }
-    } // -> đây là hàm xử lí giúp cho con rắn có thể đi được xuyên tường
+    } // -> đây là hàm xử lí giúp cho con rắn có thể đi được xuyên tường ở Level1
+
+    eventWhenTouchEdge2() {
+
+        let headSnake = this.bodySnake[0];
+        if (headSnake.x < 0) {
+            headSnake.x = WIDTH_GAME - BLOCK_SIZE;
+        }
+        if (headSnake.x > WIDTH_GAME) {
+            headSnake.x = 0;
+        }
+
+    } // -> đây là hàm xử lí giúp cho con rắn có thể đi được xuyên tường ở Level2
+    checkTouchWall2() {
+
+        let headSnake = this.bodySnake[0];
+        if (headSnake.y === 0 || headSnake.y === HEIGHT_GAME - BLOCK_SIZE)
+            return true;
+        return false;
+
+    } // -> kiểm tra con rắn có đụng tường hay không ?
+
+    checkEatFood(food) {
+        let headSnake = this.bodySnake[0];
+        return food.x === headSnake.x && food.y === headSnake.y;
+    } // -> kiểm tra rắn đã ăn mồi thành công hay chưa ?
 
     evenWhenTouchBody() {
 
@@ -179,9 +194,7 @@ class Snake {
         }
 
         if (gameOverLevel === true) {
-            clearInterval(intervalLevel);
-            alert("Game over");
-            gameOverLevel = false;
+            gameOver();
         }
 
     }  // -> đây là hàm xử lí khi con rắn chạm vào thân của mình
@@ -224,9 +237,27 @@ class Food {
 
     }
 
-    drawFood() {
-        context.fillStyle = 'red'
+    randomFoodLevel2() {
+
+        this.randomFood();
+        let temp = this.y;
+        if (temp === 0 || temp === HEIGHT_GAME - BLOCK_SIZE) {
+            this.randomFood();
+        }
+
+        // bug -> có trường hợp Food sẽ nằm trùng với vị trí của Snake
+
+    }
+
+    drawFoodLevel1() {
+        context.fillStyle = COLOR_FOOD;
         this.randomFood()
+        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE)
+    }
+
+    drawFoodLevel2() {
+        context.fillStyle = COLOR_FOOD;
+        this.randomFoodLevel2()
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE)
     }
 
@@ -240,10 +271,10 @@ class Food {
 class GameSnakeLevel1 {
 
     constructor() {
-        snake = new Snake(7,8,9,5);
+        snake = new Snake(7, 8, 9, 5);
         food = new Food(0, 0);
-        snake.drawSnake()
-        food.drawFood()
+        snake.drawSnake();
+        food.drawFoodLevel1();
     }
 
 }
@@ -251,10 +282,23 @@ class GameSnakeLevel1 {
 class GameSnakeLevel2 {
 
     constructor() {
-        snake = new Snake(10,11,12,10);
+        snake = new Snake(10, 11, 12, 10);
         food = new Food(0, 0);
         snake.drawSnake()
-        food.drawFood()
+        food.drawFoodLevel2()
+    }
+
+    drawWall() {
+
+        for (let x = 0; x < WIDTH_GAME; x += BLOCK_SIZE) {
+
+            context.fillStyle = 'red';
+            context.fillRect(x, 0, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, HEIGHT_GAME - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+
+        }
+
+
     }
 
 
@@ -270,7 +314,7 @@ function runLevel1() {
             snake.moveSnake1();
             if (snake.checkEatFood(food)) {
                 score++;
-                food.drawFood();
+                food.drawFoodLevel1();
                 snake.growUp();
                 let scoreElements = document.getElementsByClassName('score');
                 for (let element of scoreElements) {
@@ -297,14 +341,14 @@ function runLevel2() {
             snake.moveSnake2();
             if (snake.checkEatFood(food)) {
                 score++;
-                food.drawFood();
+                food.drawFoodLevel2();
                 snake.growUp();
                 let scoreElements = document.getElementsByClassName('score');
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
             }
-            TIME_OUT_LEVEL_2 -= 5;
+            TIME_OUT_LEVEL_2 -= 50;
         }, TIME_OUT_LEVEL_2);
 
         keyBoardGame();
@@ -340,12 +384,6 @@ function keyBoardGame() {
     } // -> xử lí sự kiện khi con rắn di chuyển
 
 }
-
-
-
-
-
-
 
 
 
