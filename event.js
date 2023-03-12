@@ -24,8 +24,7 @@ for (let div of divsClass) {
         div.addEventListener("click", function () {
 
             resetCanvas();
-            new GameSnakeLevel2().drawWall();
-            TIME_OUT_LEVEL_2 = 200;
+            new GameSnakeLevel2();
             runLevel2();
             resetColor(black_color);
             changeColor(div, pink_color);
@@ -34,7 +33,10 @@ for (let div of divsClass) {
     } else if (contentHTML == 'Level 3') {
 
         div.addEventListener("click", function () {
-            alert("Level 3");
+
+            resetCanvas();
+            new GameSnakeLevel3();
+            runLevel3();
             resetColor(black_color);
             changeColor(div, pink_color);
         })
@@ -105,7 +107,11 @@ function resetCanvas() {
     isRunLevel5 = false;
     isRunLevel6 = false;
 
+    TIME_OUT_LEVEL_2 = 200;
+    TIME_OUT_LEVEL_3 = 150;
+
     gameOverLevel = false;
+    arrWall=[];
 
     score = 0;
     let scoreElements = document.getElementsByClassName('score');
@@ -128,7 +134,7 @@ function gameOver() {
     context.font = "normal bold 50px serif";
     context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2);
 
-}
+}  // -> hàm này để xử lí các sự kiện sau khi kết thúc một level
 
 window.addEventListener('load', function () {
     gameLevel = new GameSnakeLevel1();
