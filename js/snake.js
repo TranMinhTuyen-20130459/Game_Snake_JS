@@ -209,6 +209,7 @@ class Snake {
 
         this.bodySnake.push(newPartBody);
         this.drawSnake();
+        eat_food_sound.play();
     }  // -> tăng độ dài cho con rắn
 
 }
@@ -300,6 +301,15 @@ class Wall {
         this.y = y;
     }
 
+    drawWall() {
+
+        context.fillStyle = COLOR_WALL;
+        this.randomWallLevel3();
+        arrWall.push(new Vector2D(this.x,this.y));
+        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
+
+    }
+
     drawWall2() {
 
         for (let x = 0; x < WIDTH_GAME; x += BLOCK_SIZE) {
@@ -367,15 +377,6 @@ class Wall {
 
     } // -> tìm vị trí các tường mới sao cho không trùng với vị trí các tường cũ
 
-    drawWall() {
-
-        context.fillStyle = COLOR_WALL;
-        this.randomWallLevel3();
-        arrWall.push(new Vector2D(this.x,this.y));
-        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
-
-    }
-
 
 }
 
@@ -423,7 +424,6 @@ class GameSnakeLevel3 {
         - Sau khi ăn mồi thành công con rắn sẽ lớn lên và điểm số sẽ tăng lên 1
         - Tường sẽ được tự động sinh ra sau khi rắn ăn mồi thành công
         - Trò chơi kết thúc khi con rắn chạm vào thân của nó hoặc là chạm vào tường được sinh ra
-
      */
     constructor() {
 
@@ -441,6 +441,7 @@ function runLevel1() {
     if (isRunLevel1 === false) { //-> nếu function này chưa được thực thi
 
         playDiv.style.display = "none"; // -> ẩn đi phần tử
+        bg_music.play();
 
         intervalLevel = setInterval(function () {
             snake.moveSnake1();
@@ -468,6 +469,7 @@ function runLevel2() {
     if (isRunLevel2 === false) {
 
         playDiv.style.display = "none"; // -> ẩn đi phần tử
+        bg_music.play();
 
         intervalLevel = setInterval(function () {
             snake.moveSnake2();
@@ -495,6 +497,7 @@ function runLevel3() {
     if (isRunLevel3 === false) {
 
         playDiv.style.display = 'none';
+        bg_music.play();
 
         intervalLevel = setInterval(function () {
             snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 3 giống cách di chuyển ở level 2

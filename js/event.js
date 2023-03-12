@@ -1,3 +1,7 @@
+let bg_music = document.getElementById('bg-music'); // âm thanh nền của game
+let gov_sound = document.getElementById('game-over-sound'); // âm thanh khi game kết thúc
+let eat_food_sound = document.getElementById('eat-food-sound');  // âm thanh mỗi khi ăn mồi thành công
+
 let black_color = 'rgb(10 10 10)';
 let pink_color = '#a10f43';
 
@@ -113,6 +117,9 @@ function resetCanvas() {
     gameOverLevel = false;
     arrWall=[];
 
+    bg_music.load(); // -> trở lại âm thanh ban đầu
+    gov_sound.load();
+
     score = 0;
     let scoreElements = document.getElementsByClassName('score');
     for (let element of scoreElements) {
@@ -133,6 +140,9 @@ function gameOver() {
     context.textAlign = "center";
     context.font = "normal bold 50px serif";
     context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2);
+
+    bg_music.pause();
+    gov_sound.play();
 
 }  // -> hàm này để xử lí các sự kiện sau khi kết thúc một level
 
