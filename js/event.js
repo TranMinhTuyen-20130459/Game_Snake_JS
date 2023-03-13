@@ -1,3 +1,5 @@
+
+
 let bg_music = document.getElementById('bg-music'); // âm thanh nền của game
 let gov_sound = document.getElementById('game-over-sound'); // âm thanh khi game kết thúc
 let eat_food_sound = document.getElementById('eat-food-sound');  // âm thanh mỗi khi ăn mồi thành công
@@ -58,7 +60,10 @@ for (let div of divsClass) {
     } else if (contentHTML == 'Level 5') {
 
         div.addEventListener("click", function () {
-            alert("Level 5")
+
+            resetCanvas();
+            new GameSnakeLevel5();
+            runLevel5();
             resetColor(black_color);
             changeColor(div, pink_color);
         })
@@ -115,6 +120,7 @@ function resetCanvas() {
 
     TIME_OUT_LEVEL_2 = 200;
     TIME_OUT_LEVEL_3 = 150;
+    TIME_OUT_LEVEL_5 = 125;
 
     gameOverLevel = false;
     arrWall=[];
@@ -126,7 +132,7 @@ function resetCanvas() {
     let scoreElements = document.getElementsByClassName('score');
     for (let element of scoreElements) {
         element.innerHTML = score;
-    }
+    } // -> reset lại điểm
 
 } // -> reset lại màn hình chơi game sau khi click vào một Level mới
 

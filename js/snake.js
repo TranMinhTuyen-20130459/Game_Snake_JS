@@ -33,6 +33,7 @@ let intervalLevel;
 let gameOverLevel = false;
 let TIME_OUT_LEVEL_2 = 200;
 let TIME_OUT_LEVEL_3 = 150;
+let TIME_OUT_LEVEL_5 = 125;
 let arrWall = []; // mảng các chướng ngại vật (tường)
 
 let isRunLevel1 = false; // biến kiểm soát Game có đang chạy ở Level 1 hay không ?
@@ -233,13 +234,48 @@ class Food {
          hàm Math.random() sẽ random ra các con số từ 0 - 1
          */
 
-        this.x = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
-        this.y = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
+        let checkWhile;
+        let foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
+        let foodY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
+
+        let bodySnake = snake.bodySnake;
+        for (let partBody of bodySnake) {
+
+            if (foodX === partBody.x && foodY === partBody.y) {
+                checkWhile = true;
+                break; // -> thoát khỏi vòng for, xuống chạy vòng while
+            } else {
+                checkWhile = false;
+            }
+
+        }
+
+        while (checkWhile === true) {
+            foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
+            foodY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
+
+            for (let partBody of bodySnake) {
+
+                // tọa độ thức ăn không trùng với tọa độ các phần thân của con rắn
+                if (!(foodX === partBody.x && foodY === partBody.y)) {
+                    checkWhile = false;
+                } else {
+                    checkWhile = true;
+                    break; // thoát khỏi vòng for nhưng vẫn chạy vòng while
+                }
+            }
+
+        }
+
+        this.x = foodX;
+        this.y = foodY;
+
         console.log('x:' + this.x, 'y:' + this.y);
 
         // bug -> có trường hợp Food sẽ nằm trùng với vị trí của Snake
 
-    } // -> tọa độ cùa food nằm ngẫu nhiên trên màn hình canvas
+
+    } // -> tọa độ cùa food nằm ngẫu nhiên trên màn hình canvas , không được trùng với vị trí của con rắn
 
     randomFoodLevel2() {
 
@@ -251,22 +287,38 @@ class Food {
                + Nếu không trùng thì tọa độ food (x,y) được random ở b1 được coi là tọa độ chính thức của food
          */
 
-        let checkWhile;
+        let checkWhileWall;
+        let checkWhileSnake;
+        let bodySnake = snake.bodySnake;
+
         let foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
         let foodY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
 
         for (let wall of arrWall) {
 
             if (foodX === wall.x && foodY === wall.y) {
-                checkWhile = true; // -> nếu là true thì sẽ chạy vòng lặp while ở dưới -->*Note: kĩ thuật bật/tắt vòng lặp while
+                checkWhileWall = true;
                 break;
             } else {
-                checkWhile = false;
+                checkWhileWall = false;
             }
 
         }
 
-        while (checkWhile === true) {
+        for (let partBody of bodySnake) {
+
+            if (foodX === partBody.x && foodY === partBody.y) {
+                checkWhileSnake = true;
+                break;
+            } else {
+                checkWhileSnake = false;
+            }
+        }
+
+        // --> * Note: kĩ thuật bật/tắt vòng lặp while
+
+        while (checkWhileWall || checkWhileSnake) {
+
             foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
             foodY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
 
@@ -274,12 +326,24 @@ class Food {
 
                 // nếu tọa độ của mồi không trùng với tọa độ của tường
                 if (!(foodX === wall.x && foodY === wall.y)) {
-                    checkWhile = false;
+                    checkWhileWall = false;
                 } else {
-                    checkWhile = true;
-                    break; // -> thoát khỏi vòng for nhưng vẫn chạy lại vòng while
+                    checkWhileWall = true;
+                    break; // -> thoát khỏi vòng for
                 }
             }
+
+            for (let partBody of bodySnake) {
+
+                // nếu tọa độ của mồi không trùng với tọa độ của rắn
+                if (!(foodX === partBody.x && foodY === partBody.y)) {
+                    checkWhileSnake = false;
+                } else {
+                    checkWhileSnake = true;
+                    break; // -> thoát khỏi vòng for
+                }
+            }
+
         }
 
         this.x = foodX;
@@ -287,7 +351,7 @@ class Food {
 
         console.log('Food- ' + 'x:' + this.x, 'y:' + this.y);
 
-    }// -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường)
+    } // -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường) và tọa độ của con rắn
 
     drawFoodLevel1() {
         context.fillStyle = COLOR_FOOD;
@@ -394,16 +458,51 @@ class Wall {
 
     } // -> vẽ các chướng ngại vật (Tường) ở level 3
 
+    drawWall5() {
+
+        for (let x = 0; x < WIDTH_GAME; x += BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(x, 0, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, HEIGHT_GAME - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+
+            // thêm vào danh sách các chướng ngại vật
+            arrWall.push(new Vector2D(x, 0), new Vector2D(x, HEIGHT_GAME - BLOCK_SIZE));
+
+        }
+
+        for (let x = BLOCK_SIZE * 6; x < WIDTH_GAME - BLOCK_SIZE * 6; x += BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(x, BLOCK_SIZE * 4, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, BLOCK_SIZE * 5, BLOCK_SIZE, BLOCK_SIZE);
+            arrWall.push(new Vector2D(x, BLOCK_SIZE * 4), new Vector2D(x, BLOCK_SIZE * 5));
+        }
+
+        for (let y = BLOCK_SIZE * 5; y < HEIGHT_GAME - BLOCK_SIZE * 5; y += BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(BLOCK_SIZE * 11, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(BLOCK_SIZE * 12, y, BLOCK_SIZE, BLOCK_SIZE);
+
+            arrWall.push(new Vector2D(BLOCK_SIZE * 11, y), new Vector2D(BLOCK_SIZE * 12, y));
+
+
+        }
+
+
+    }// -> vẽ các chướng ngại vật (Tường) ở level 5
+
     drawWallRandom() {
 
         context.fillStyle = COLOR_WALL;
-        this.randomWallLevel4();
+        this.randomWall();
         arrWall.push(new Vector2D(this.x, this.y));
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
 
     } // -> vị trí các tường mới không trùng với vị trí tường cũ
 
-    randomWallLevel4() {
+    randomWall() {
 
         let checkWhile;
         let foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
@@ -524,6 +623,22 @@ class GameSnakeLevel4 {
 
 }
 
+class GameSnakeLevel5 {
+
+    constructor() {
+
+        snake = new Snake(11, 12, 13, 16);
+        food = new Food();
+        wall = new Wall();
+
+        wall.drawWall5();
+        food.drawFoodLevel2();
+        snake.drawSnake();
+
+    }
+
+}
+
 function runLevel1() {
 
     if (isRunLevel1 === false) { //-> nếu function này chưa được thực thi
@@ -620,9 +735,9 @@ function runLevel4() {
             snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 4 giống cách di chuyển ở level 2
             if (snake.checkEatFood(food)) {
                 score++;
+                wall.drawWallRandom();
                 food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
                 snake.growUp();
-                wall.drawWallRandom();
                 let scoreElements = document.getElementsByClassName('score');
                 for (let element of scoreElements) {
                     element.innerHTML = score;
@@ -635,6 +750,34 @@ function runLevel4() {
 
         isRunLevel4 = true; // -> giúp đảm bảo hàm này chỉ được gọi một lần duy nhất trong suốt thời gian chơi game
 
+    }
+}
+
+function runLevel5() {
+
+    if (isRunLevel5 === false) {
+
+        playDiv.style.display = 'none';
+        bg_music.play();
+
+        intervalLevel = setInterval(function () {
+            snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 5 giống cách di chuyển ở level 2
+            if (snake.checkEatFood(food)) {
+                score++;
+                wall.drawWallRandom();
+                food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
+                snake.growUp();
+                let scoreElements = document.getElementsByClassName('score');
+                for (let element of scoreElements) {
+                    element.innerHTML = score;
+                }
+            }
+
+        }, TIME_OUT_LEVEL_5)
+
+        keyBoardGame();
+
+        isRunLevel5 = true;
     }
 }
 
