@@ -40,7 +40,7 @@ for (let div of divsClass) {
 
             resetCanvas();
             new GameSnakeLevel3();
-            runLevel3();
+            runLevel3()
             resetColor(black_color);
             changeColor(div, pink_color);
         })
@@ -48,7 +48,9 @@ for (let div of divsClass) {
     } else if (contentHTML == 'Level 4') {
 
         div.addEventListener("click", function () {
-            alert("Level 4")
+            resetCanvas();
+            new GameSnakeLevel4();
+            runLevel4();
             resetColor(black_color);
             changeColor(div, pink_color);
         })

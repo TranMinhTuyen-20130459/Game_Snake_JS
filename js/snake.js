@@ -18,6 +18,10 @@ const LEFT = 37;
 const RIGHT = 39;
 const UP = 38;
 const DOWN = 40;
+const A = 65;
+const D = 68;
+const W = 87;
+const S = 83;
 
 let snake;
 let food;
@@ -29,7 +33,7 @@ let intervalLevel;
 let gameOverLevel = false;
 let TIME_OUT_LEVEL_2 = 200;
 let TIME_OUT_LEVEL_3 = 150;
-let arrWall = []; // mảng các chướng ngại vật
+let arrWall = []; // mảng các chướng ngại vật (tường)
 
 let isRunLevel1 = false; // biến kiểm soát Game có đang chạy ở Level 1 hay không ?
 let isRunLevel2 = false; // biến kiểm soát Game có đang chạy ở Level 2 hay không ?
@@ -78,7 +82,7 @@ class Snake {
             context.fillRect(this.bodySnake[i].x, this.bodySnake[i].y, BLOCK_SIZE, BLOCK_SIZE)
         }
 
-    }
+    } // -> vẽ con rắn
 
     clearSnake() {
 
@@ -91,7 +95,7 @@ class Snake {
             context.fillRect(this.bodySnake[i].x, this.bodySnake[i].y, BLOCK_SIZE, BLOCK_SIZE)
         }
 
-    }
+    } // -> xóa con rắn
 
     moveSnake1() {
 
@@ -197,6 +201,8 @@ class Snake {
     } // -> kiểm tra rắn đã ăn mồi thành công hay chưa ?
 
     growUp() {
+        eat_food_sound.play();
+
         this.clearSnake();
         let partBodyLast = this.bodySnake[this.bodySnake.length - 1]; // phần cuối cùng của con rắn trước khi tăng trưởng
         let partBodyBeforeLast = this.bodySnake[this.bodySnake.length - 2]; // phần gần cuối cùng của con rắn trước khi tăng trưởng
@@ -209,7 +215,6 @@ class Snake {
 
         this.bodySnake.push(newPartBody);
         this.drawSnake();
-        eat_food_sound.play();
     }  // -> tăng độ dài cho con rắn
 
 }
@@ -231,11 +236,20 @@ class Food {
         this.x = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
         this.y = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
         console.log('x:' + this.x, 'y:' + this.y);
+
         // bug -> có trường hợp Food sẽ nằm trùng với vị trí của Snake
 
-    }
+    } // -> tọa độ cùa food nằm ngẫu nhiên trên màn hình canvas
 
     randomFoodLevel2() {
+
+        /*
+            - b1: Lấy ngẫu nhiên tọa độ của food (x,y)
+            - b2: Kiểm tra tọa độ đó có trùng với tọa độ nào trong danh sách các chướng ngại vật (tường) hay không ?
+            - b3:
+               + Nếu trùng thì chạy vòng lặp while, tiếp tục chạy lại b1 và b2
+               + Nếu không trùng thì tọa độ food (x,y) được random ở b1 được coi là tọa độ chính thức của food
+         */
 
         let checkWhile;
         let foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
@@ -271,9 +285,9 @@ class Food {
         this.x = foodX;
         this.y = foodY;
 
-        console.log('x:' + this.x, 'y:' + this.y);
+        console.log('Food- ' + 'x:' + this.x, 'y:' + this.y);
 
-    }
+    }// -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường)
 
     drawFoodLevel1() {
         context.fillStyle = COLOR_FOOD;
@@ -285,7 +299,7 @@ class Food {
         context.fillStyle = COLOR_FOOD;
         this.randomFoodLevel2();
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
-    }
+    } // -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường)
 
     clearFood() {
         context.fillStyle = COLOR_BACKGROUND
@@ -299,15 +313,6 @@ class Wall {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-    }
-
-    drawWall() {
-
-        context.fillStyle = COLOR_WALL;
-        this.randomWallLevel3();
-        arrWall.push(new Vector2D(this.x,this.y));
-        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
-
     }
 
     drawWall2() {
@@ -337,7 +342,68 @@ class Wall {
 
     } // -> vẽ các chướng ngại vật (Tường) ở level 2
 
-    randomWallLevel3() {
+    drawWall3() {
+
+        for (let x = 0; x < WIDTH_GAME; x += BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(x, 0, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, HEIGHT_GAME - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+
+            // thêm vào danh sách các chướng ngại vật
+            arrWall.push(new Vector2D(x, 0), new Vector2D(x, HEIGHT_GAME - BLOCK_SIZE));
+
+        }
+
+        for (let y = BLOCK_SIZE * 5; y < HEIGHT_GAME - 5 * BLOCK_SIZE; y += BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(BLOCK_SIZE * 0, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(BLOCK_SIZE * 4, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(BLOCK_SIZE * 8, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(BLOCK_SIZE * 12, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(WIDTH_GAME - BLOCK_SIZE, y, BLOCK_SIZE, BLOCK_SIZE);
+
+            // thêm vào danh sách các chướng ngại vật
+            arrWall.push(new Vector2D(BLOCK_SIZE * 0, y),
+                new Vector2D(BLOCK_SIZE * 4, y),
+                new Vector2D(BLOCK_SIZE * 8, y),
+                new Vector2D(BLOCK_SIZE * 12, y),
+                new Vector2D(WIDTH_GAME - BLOCK_SIZE, y));
+
+        }
+
+        for (let x = WIDTH_GAME - BLOCK_SIZE; x > BLOCK_SIZE * 12; x -= BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(x, BLOCK_SIZE * 5, BLOCK_SIZE, BLOCK_SIZE);
+
+            arrWall.push(new Vector2D(x, BLOCK_SIZE * 5));
+
+        }
+
+        for (let x = WIDTH_GAME - BLOCK_SIZE; x > BLOCK_SIZE * 15; x -= BLOCK_SIZE) {
+
+            context.fillStyle = COLOR_WALL;
+            context.fillRect(x, HEIGHT_GAME - 5 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+
+            arrWall.push(new Vector2D(x, HEIGHT_GAME - 5 * BLOCK_SIZE));
+
+        }
+
+
+    } // -> vẽ các chướng ngại vật (Tường) ở level 3
+
+    drawWallRandom() {
+
+        context.fillStyle = COLOR_WALL;
+        this.randomWallLevel4();
+        arrWall.push(new Vector2D(this.x, this.y));
+        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
+
+    } // -> vị trí các tường mới không trùng với vị trí tường cũ
+
+    randomWallLevel4() {
 
         let checkWhile;
         let foodX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
@@ -346,7 +412,7 @@ class Wall {
         for (let wall of arrWall) {
 
             if (foodX === wall.x && foodY === wall.y) {
-                checkWhile = true; // -> nếu là true thì sẽ chạy vòng lặp while ở dưới --> *Note: kĩ thuật bật/tắt vòng lặp while
+                checkWhile = true; // -> nếu là true thì sẽ chạy vòng lặp while ở dưới --> * Note: kĩ thuật bật/tắt vòng lặp while
                 break;
             } else {
                 checkWhile = false;
@@ -373,7 +439,7 @@ class Wall {
         this.x = foodX;
         this.y = foodY;
 
-        console.log('x:' + this.x, 'y:' + this.y);
+        console.log('Wall- ' + 'x:' + this.x, 'y:' + this.y);
 
     } // -> tìm vị trí các tường mới sao cho không trùng với vị trí các tường cũ
 
@@ -407,17 +473,39 @@ class GameSnakeLevel2 {
 
 
     constructor() {
+        wall = new Wall();
         snake = new Snake(10, 11, 12, 10);
         food = new Food(0, 0);
-        wall = new Wall();
+
+        wall.drawWall2();
         snake.drawSnake();
         food.drawFoodLevel2();
-        wall.drawWall2();
     }
 
 }
 
 class GameSnakeLevel3 {
+
+    /*
+    - Người chơi điều khiển con rắn ăn mồi và vượt qua các chướng ngại vật (tường)
+    - Tường ở Level 3 sẽ nhiều tường hơn Level 2
+    - Sau khi ăn mồi thành công thì con rắn sẽ lớn lên và điểm số sẽ tăng lên 1
+    - Trò chơi kết thúc khi người chơi điều khiển con rắn chạm vào thân của nó hoặc là chạm vào tường
+    */
+
+    constructor() {
+        snake = new Snake(10, 11, 12, 17);
+        food = new Food();
+        wall = new Wall();
+
+        wall.drawWall3();
+        food.drawFoodLevel2();
+        snake.drawSnake();
+    }
+
+}
+
+class GameSnakeLevel4 {
 
     /*
         - Người chơi điều khiển con rắn ăn mồi
@@ -500,12 +588,41 @@ function runLevel3() {
         bg_music.play();
 
         intervalLevel = setInterval(function () {
-            snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 3 giống cách di chuyển ở level 2
+            snake.moveSnake2();
+            if (snake.checkEatFood(food)) {
+                score++;
+                food.drawFoodLevel2();
+                snake.growUp();
+                let scoreElements = document.getElementsByClassName('score');
+                for (let element of scoreElements) {
+                    element.innerHTML = score;
+                }
+                TIME_OUT_LEVEL_3 -= 10;
+            }
+
+        }, TIME_OUT_LEVEL_3);
+
+        keyBoardGame();
+
+        isRunLevel3 = true;
+    }
+
+}
+
+function runLevel4() {
+
+    if (isRunLevel4 === false) {
+
+        playDiv.style.display = 'none';
+        bg_music.play();
+
+        intervalLevel = setInterval(function () {
+            snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 4 giống cách di chuyển ở level 2
             if (snake.checkEatFood(food)) {
                 score++;
                 food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
                 snake.growUp();
-                wall.drawWall();
+                wall.drawWallRandom();
                 let scoreElements = document.getElementsByClassName('score');
                 for (let element of scoreElements) {
                     element.innerHTML = score;
@@ -516,7 +633,7 @@ function runLevel3() {
 
         keyBoardGame();
 
-        isRunLevel3 = true; // -> giúp đảm bảo hàm này chỉ được gọi một lần duy nhất trong suốt thời gian chơi game
+        isRunLevel4 = true; // -> giúp đảm bảo hàm này chỉ được gọi một lần duy nhất trong suốt thời gian chơi game
 
     }
 }
@@ -541,10 +658,26 @@ function keyBoardGame() {
                 if (currentDirectionSnake.y === -1) break;  // -> không cho phép con rắn được được đổi hướng lên trên
                 currentDirectionSnake = new Vector2D(0, 1)
                 break;
+            case A:
+                if (currentDirectionSnake.x === 1) break; // -> không cho phép con rắn được được đổi hướng sang bên phải
+                currentDirectionSnake = new Vector2D(-1, 0);
+                break;
+            case D:
+                if (currentDirectionSnake.x === -1) break;  // -> không cho phép con rắn được được đổi hướng sang bên trái
+                currentDirectionSnake = new Vector2D(1, 0)
+                break;
+            case W:
+                if (currentDirectionSnake.y === 1) break;  // -> không cho phép con rắn được được đổi hướng xuống dưới
+                currentDirectionSnake = new Vector2D(0, -1)
+                break;
+            case S:
+                if (currentDirectionSnake.y === -1) break;  // -> không cho phép con rắn được được đổi hướng lên trên
+                currentDirectionSnake = new Vector2D(0, 1)
+                break;
             default:
                 break;
         }
-        //  console.log(e.keyCode)
+        // console.log(e.keyCode)
     } // -> xử lí sự kiện khi con rắn di chuyển
 
 }
