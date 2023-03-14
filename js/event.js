@@ -107,6 +107,10 @@ function resetColor(color) {
 function resetCanvas() {
 
     clearInterval(intervalLevel);
+    clearInterval(intervalDoor);
+    clearInterval(intervalRemoveDoor);
+
+    clearTimeout(timeOutRemoveDoor);
 
     context.fillStyle = COLOR_BACKGROUND;
     context.fillRect(0, 0, WIDTH_GAME, HEIGHT_GAME);
@@ -120,10 +124,10 @@ function resetCanvas() {
 
     TIME_OUT_LEVEL_1 = 175;
     TIME_OUT_LEVEL_2 = 150;
-    TIME_OUT_LEVEL_3 = 250;
+    TIME_OUT_LEVEL_3 = 150;
     TIME_OUT_LEVEL_4 = 150;
     TIME_OUT_LEVEL_5 = 125;
-    TIME_OUT_LEVEL_6 = 150;
+    TIME_OUT_LEVEL_6 = 200;
 
     gameOverLevel = false;
     arrWall = [];
@@ -142,6 +146,10 @@ function resetCanvas() {
 function gameOver() {
 
     clearInterval(intervalLevel);
+    clearInterval(intervalDoor);
+    clearInterval(intervalRemoveDoor);
+
+    clearTimeout(timeOutRemoveDoor);
 
     // xóa các pixel trong một hình chữ nhật bằng cách đặt màu pixel thành đen trong suốt rgba (0,0,0,0)
     context.clearRect(0, 0, WIDTH_GAME, HEIGHT_GAME);

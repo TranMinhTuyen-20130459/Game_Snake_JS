@@ -8,6 +8,7 @@ canvas.width = WIDTH_GAME , canvas.height = HEIGHT_GAME;
 
 const COLOR_BACKGROUND = 'black';
 const COLOR_FOOD = 'yellow';
+const COLOR_DOOR = 'purple';
 const COLOR_WALL = 'red';
 
 const context = canvas.getContext('2d');
@@ -26,18 +27,22 @@ const S = 83;
 let snake;
 let food;
 let wall;
+let door;
 let currentDirectionSnake; // hướng hiện tại của con rắn hệ trục tọa độ x,y
 let score = 0;
 let gameLevel;
 let intervalLevel;
+let intervalDoor;
+let intervalRemoveDoor;
+let timeOutRemoveDoor;
 let gameOverLevel = false;
 
 let TIME_OUT_LEVEL_1 = 175;
 let TIME_OUT_LEVEL_2 = 150;
-let TIME_OUT_LEVEL_3 = 250;
+let TIME_OUT_LEVEL_3 = 150;
 let TIME_OUT_LEVEL_4 = 125;
 let TIME_OUT_LEVEL_5 = 125;
-let TIME_OUT_LEVEL_6 = 150;
+let TIME_OUT_LEVEL_6 = 200;
 
 let arrWall = []; // mảng các chướng ngại vật (tường)
 
@@ -103,6 +108,12 @@ class Snake {
 
     } // -> xóa con rắn
 
+    clearBodySnake() {
+        for (let i = 1; i < this.bodySnake.length; i++) {
+            context.fillRect(this.bodySnake[i].x, this.bodySnake[i].y, BLOCK_SIZE, BLOCK_SIZE)
+        }
+    } // -> xóa đi phần thân của con rắn
+
     moveSnake1() {
 
         /*
@@ -149,7 +160,34 @@ class Snake {
             gameOver();
         }
 
-    } // -> con rắn tự động di chuyển ở Level 2 và 3
+    } // -> con rắn tự động di chuyển ở Level 2 , 4, 5
+
+    moveSnake3() {
+
+        /*
+         khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
+         */
+
+        this.clearSnake();
+
+        for (let i = this.bodySnake.length - 1; i > 0; i--) {
+            this.bodySnake[i].x = this.bodySnake[i - 1].x;
+            this.bodySnake[i].y = this.bodySnake[i - 1].y;
+        }
+
+        this.bodySnake[0].x += currentDirectionSnake.x * BLOCK_SIZE;
+        this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
+
+        this.drawSnake();
+        this.evenWhenTouchBody();
+        this.eventWhenTouchEdge();
+        this.eventWhenTouchDoor();
+
+        if (this.checkTouchWall2()) {
+            gameOver();
+        }
+
+    } // -> con rắn tự động di chuyển ở Level 3
 
     evenWhenTouchBody() {
 
@@ -188,6 +226,38 @@ class Snake {
         }
     } // -> đây là hàm xử lí giúp cho con rắn có thể đi được xuyên tường ở tất cả các level
 
+    eventWhenTouchDoor() {
+
+        let headSnake = this.bodySnake[0];
+        let arrDoor = door.arrDoor;
+
+        if (arrDoor.length > 0) {
+
+            // nếu đầu con rắn trùng tọa độ với cánh cửa thứ nhất
+            if (headSnake.x === arrDoor[0].x && headSnake.y === arrDoor[0].y) {
+
+                headSnake.x = arrDoor[1].x;
+                headSnake.y = arrDoor[1].y;
+                door.arrDoor = [];
+
+
+            }
+
+            // nếu đầu con rắn trùng tọa độ với cánh cửa thứ 2
+            else if (headSnake.x === arrDoor[1].x && headSnake.y === arrDoor[1].y) {
+
+                headSnake.x = arrDoor[0].x;
+                headSnake.y = arrDoor[0].y;
+                door.arrDoor = [];
+
+
+            }
+
+        }
+
+
+    } // -> đây là hàm xử lí khi con rắn chạm vào một trong 2 cánh cửa thần kỳ
+
     checkTouchWall2() {
 
         let headSnake = this.bodySnake[0];
@@ -222,6 +292,7 @@ class Snake {
         this.bodySnake.push(newPartBody);
         this.drawSnake();
     }  // -> tăng độ dài cho con rắn
+
 
 }
 
@@ -363,13 +434,13 @@ class Food {
         context.fillStyle = COLOR_FOOD;
         this.randomFoodLevel1();
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
-    }
+    } // -> tọa độ của food không được trùng với tọa độ của con rắn
 
     drawFoodLevel2() {
         context.fillStyle = COLOR_FOOD;
         this.randomFoodLevel2();
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
-    } // -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường)
+    } // -> tọa độ của food không được trùng với tọa độ của các chướng ngại vật (tường) và tọa độ của con rắn
 
     clearFood() {
         context.fillStyle = COLOR_BACKGROUND
@@ -433,7 +504,6 @@ class Wall {
             arrWall.push(new Vector2D(x, HEIGHT_GAME - 5 * BLOCK_SIZE));
 
         }
-
 
 
     } // -> vẽ các chướng ngại vật (Tường) ở level 2
@@ -643,8 +713,117 @@ class Wall {
 
         console.log('Wall- ' + 'x:' + this.x, 'y:' + this.y);
 
-    } // -> tìm vị trí các tường mới sao cho không trùng với vị trí các tường cũ
+    } // -> tìm vị trí các tường mới sao cho không trùng với vị trí các tường cũ và vị trí của con rắn
 
+
+}
+
+class Door {
+
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.arrDoor = [];
+    }
+
+    randomDoor() {
+
+
+        let checkWhileWall;
+        let checkWhileSnake;
+        let checkWhileFood;
+
+        let bodySnake = snake.bodySnake;
+
+        let doorX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
+        let doorY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
+
+        for (let wall of arrWall) {
+
+            if (doorX === wall.x && doorY === wall.y) {
+                checkWhileWall = true;
+                break;
+            } else {
+                checkWhileWall = false;
+            }
+
+        }
+
+        for (let partBody of bodySnake) {
+
+            if (doorX === partBody.x && doorY === partBody.y) {
+                checkWhileSnake = true;
+                break;
+            } else {
+                checkWhileSnake = false;
+            }
+        }
+
+        if (doorX === food.x && doorY === food.y) {
+            checkWhileFood = true;
+        }
+
+        // --> * Note: kĩ thuật bật/tắt vòng lặp while
+        while (checkWhileWall || checkWhileSnake || checkWhileFood) {
+
+            doorX = Math.floor(Math.random() * (cols - 1)) * BLOCK_SIZE;
+            doorY = Math.floor(Math.random() * (rows - 1)) * BLOCK_SIZE;
+
+            for (let wall of arrWall) {
+
+                // nếu tọa độ của cánh cửa Random không trùng với tọa độ của tường
+                if (!(doorX === wall.x && doorY === wall.y)) {
+                    checkWhileWall = false;
+                } else {
+                    checkWhileWall = true;
+                    break; // -> thoát khỏi vòng for
+                }
+            }
+
+            for (let partBody of bodySnake) {
+
+                // nếu tọa độ của cánh cửa Random không trùng với tọa độ của rắn
+                if (!(doorX === partBody.x && doorY === partBody.y)) {
+                    checkWhileSnake = false;
+                } else {
+                    checkWhileSnake = true;
+                    break; // -> thoát khỏi vòng for
+                }
+            }
+
+            // nếu tọa độ của cánh cửa Random trùng với tọa độ của thức ăn
+            if (doorX === food.x && doorY === food.y) {
+                checkWhileFood = true;
+            }
+
+        }
+
+        this.x = doorX;
+        this.y = doorY;
+
+    } // -> tìm vị trí của 2 cánh cửa mới sao cho không trùng với vị trí của tường , rắn và thức ăn
+
+
+    drawRandomDoor() {
+
+        context.fillStyle = COLOR_DOOR;
+        this.randomDoor();
+        this.arrDoor.push(new Vector2D(this.x, this.y));
+        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
+        this.randomDoor();
+        this.arrDoor.push(new Vector2D(this.x, this.y));
+        context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
+
+    }// -> cánh cửa màu tím , khi con rắn chạm vào một trong 2 cánh cửa bất kì thì sẽ dịch chuyển đến cánh cửa còn lại
+
+    clearDoor() {
+        context.fillStyle = COLOR_BACKGROUND;
+        for (let door of this.arrDoor) {
+            context.fillRect(door.x, door.y, BLOCK_SIZE, BLOCK_SIZE); // -> xóa trên giao diện canvas
+        }
+
+        this.arrDoor = []; // -> xóa toàn bộ phần tử trong mảng
+    }
 
 }
 
@@ -696,13 +875,15 @@ class GameSnakeLevel3 {
     */
 
     constructor() {
+        wall = new Wall();
         snake = new Snake(10, 11, 12, 17);
         food = new Food();
-        wall = new Wall();
+        door = new Door();
 
         wall.drawWall3();
-        food.drawFoodLevel2();
         snake.drawSnake();
+        food.drawFoodLevel2();
+        door.drawRandomDoor();
     }
 
 }
@@ -761,6 +942,7 @@ class GameSnakeLevel6 {
         wall.drawWall6();
         snake.drawSnake();
         food.drawFoodLevel2();
+
 
     }
 
@@ -830,7 +1012,7 @@ function runLevel3() {
         bg_music.play();
 
         intervalLevel = setInterval(function () {
-            snake.moveSnake2();
+            snake.moveSnake3();
             if (snake.checkEatFood(food)) {
                 score++;
                 food.drawFoodLevel2();
@@ -844,9 +1026,33 @@ function runLevel3() {
 
         }, TIME_OUT_LEVEL_3);
 
-        keyBoardGameReverse();
+        intervalDoor = setInterval(function () {
+
+            door.drawRandomDoor();
+
+        }, 20000);
+
+        intervalRemoveDoor = setInterval(function () {
+
+            if (door.arrDoor.length > 0) {
+                door.clearDoor();
+            }
+
+        }, 30000);
+
+        timeOutRemoveDoor = setTimeout(function () {
+
+            if (door.arrDoor.length > 0) {
+
+                door.clearDoor();
+            }
+
+        }, 10000);
+
+        keyBoardGame();
 
         isRunLevel3 = true;
+
     }
 
 }
@@ -917,13 +1123,21 @@ function runLevel6() {
 
         intervalLevel = setInterval(function () {
 
+            snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 6 giống cách di chuyển ở level 2
+            if (snake.checkEatFood(food)) {
+                score++;
+                wall.drawWallRandom();
+                food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
+                snake.growUp();
+                let scoreElements = document.getElementsByClassName('score');
+                for (let element of scoreElements) {
+                    element.innerHTML = score;
+                }
+            }
 
+        }, TIME_OUT_LEVEL_6);
 
-
-        },TIME_OUT_LEVEL_6);
-
-
-        keyBoardGame();
+        keyBoardGameReverse();
         isRunLevel6 = true;
     }
 
@@ -1015,7 +1229,7 @@ function keyBoardGameReverse() {
         // console.log(e.keyCode)
     } // -> xử lí sự kiện khi con rắn di chuyển
 
-} // -> sự kiện bàn phím để chơi game Level 3
+} // -> sự kiện bàn phím để chơi game Level 6
 
 
 
