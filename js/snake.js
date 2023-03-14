@@ -499,9 +499,9 @@ class Wall {
         for (let x = WIDTH_GAME - BLOCK_SIZE; x > BLOCK_SIZE * 15; x -= BLOCK_SIZE) {
 
             context.fillStyle = COLOR_WALL;
-            context.fillRect(x, HEIGHT_GAME - 5 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, HEIGHT_GAME - 6 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
-            arrWall.push(new Vector2D(x, HEIGHT_GAME - 5 * BLOCK_SIZE));
+            arrWall.push(new Vector2D(x, HEIGHT_GAME - 6 * BLOCK_SIZE));
 
         }
 
@@ -551,9 +551,9 @@ class Wall {
         for (let x = WIDTH_GAME - BLOCK_SIZE; x > BLOCK_SIZE * 15; x -= BLOCK_SIZE) {
 
             context.fillStyle = COLOR_WALL;
-            context.fillRect(x, HEIGHT_GAME - 5 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, HEIGHT_GAME - 6 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
-            arrWall.push(new Vector2D(x, HEIGHT_GAME - 5 * BLOCK_SIZE));
+            arrWall.push(new Vector2D(x, HEIGHT_GAME - 6 * BLOCK_SIZE));
 
         }
 
