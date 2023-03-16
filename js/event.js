@@ -146,9 +146,9 @@ function resetCanvas() {
 
 function gameOver() {
 
-    clearInterval(intervalLevel);
-    clearInterval(intervalDoor);
-    clearInterval(intervalRemoveDoor);
+    clearInterval(intervalLevel); // dừng hẳn level-game đang chơi lại
+    clearInterval(intervalDoor); // dừng hẳn đoạn code sinh ra cánh cửa thần kỳ
+    clearInterval(intervalRemoveDoor); // dừng hẳn đoạn code xóa đi cánh cửa thần kỳ
 
     clearTimeout(timeOutRemoveDoor);
 
@@ -159,7 +159,7 @@ function gameOver() {
     context.textBaseline = "middle";
     context.textAlign = "center";
     context.font = "normal bold 50px serif";
-    context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2);
+    context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2); // => thông báo game kết thúc
 
     bg_music.pause(); // tạm dừng nhạc nền game
     gov_sound.play(); // phát ra âm thanh kết thúc game
