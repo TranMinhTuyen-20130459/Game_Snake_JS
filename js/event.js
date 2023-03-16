@@ -1,3 +1,4 @@
+
 let bg_music = document.getElementById('bg-music'); // âm thanh nền của game
 let gov_sound = document.getElementById('game-over-sound'); // âm thanh khi game kết thúc
 let eat_food_sound = document.getElementById('eat-food-sound');  // âm thanh mỗi khi ăn mồi thành công
@@ -130,7 +131,7 @@ function resetCanvas() {
     TIME_OUT_LEVEL_6 = 200;
 
     gameOverLevel = false;
-    arrWall = [];
+    arrWall = []; // -> reset lại mảng các chướng ngại vật (tường)
 
     bg_music.load(); // -> trở lại âm thanh ban đầu
     gov_sound.load();
@@ -145,9 +146,9 @@ function resetCanvas() {
 
 function gameOver() {
 
-    clearInterval(intervalLevel);
-    clearInterval(intervalDoor);
-    clearInterval(intervalRemoveDoor);
+    clearInterval(intervalLevel); // dừng hẳn level-game đang chơi lại
+    clearInterval(intervalDoor); // dừng hẳn đoạn code sinh ra cánh cửa thần kỳ
+    clearInterval(intervalRemoveDoor); // dừng hẳn đoạn code xóa đi cánh cửa thần kỳ
 
     clearTimeout(timeOutRemoveDoor);
 
@@ -158,10 +159,10 @@ function gameOver() {
     context.textBaseline = "middle";
     context.textAlign = "center";
     context.font = "normal bold 50px serif";
-    context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2);
+    context.fillText("Game Over", WIDTH_GAME / 2, HEIGHT_GAME / 2); // => thông báo game kết thúc
 
-    bg_music.pause();
-    gov_sound.play();
+    bg_music.pause(); // tạm dừng nhạc nền game
+    gov_sound.play(); // phát ra âm thanh kết thúc game
 
 }  // -> hàm này để xử lí các sự kiện sau khi kết thúc một level
 
@@ -170,5 +171,5 @@ window.addEventListener('load', function () {
     canvas.onclick = function () {
         runLevel1();
     }
-}) // -> hàm này được gọi khi trang được load
+}) // -> hàm này được gọi khi trang vừa được load
 

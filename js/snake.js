@@ -28,7 +28,7 @@ let snake;
 let food;
 let wall;
 let door;
-let currentDirectionSnake; // hướng hiện tại của con rắn hệ trục tọa độ x,y
+let currentDirectionSnake; // hướng hiện tại của con rắn theo hệ trục tọa độ x,y
 let score = 0;
 let gameLevel;
 let intervalLevel;
@@ -112,12 +112,16 @@ class Snake {
         for (let i = 1; i < this.bodySnake.length; i++) {
             context.fillRect(this.bodySnake[i].x, this.bodySnake[i].y, BLOCK_SIZE, BLOCK_SIZE)
         }
-    } // -> xóa đi phần thân của con rắn
+    } // -> xóa đi phần thân của con rắn (phần đầu vẫn giữ nguyên)
 
     moveSnake1() {
 
         /*
-         khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
+         - khi con rắn di chuyển thực chất là ta sẽ :
+              + xóa đi con rắn ở vị trí cũ,
+              + cập nhật lại vị trí mới của con rắn,
+              + vẽ lại con rắn ở vị trí mới
+         -> sau đó dùng hàm setInterval() thực hiện các hàm xóa và vẽ lại liên tục trên Canvas sau một khoảng thời gian nhất định
          */
 
         this.clearSnake();
@@ -139,7 +143,11 @@ class Snake {
     moveSnake2() {
 
         /*
-         khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
+         - khi con rắn di chuyển thực chất là ta sẽ :
+              + xóa đi con rắn ở vị trí cũ,
+              + cập nhật lại vị trí mới của con rắn,
+              + vẽ lại con rắn ở vị trí mới
+         -> sau đó dùng hàm setInterval() thực hiện các hàm xóa và vẽ lại liên tục trên Canvas sau một khoảng thời gian nhất định
          */
 
         this.clearSnake();
@@ -153,21 +161,18 @@ class Snake {
         this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
 
         this.drawSnake();
-        this.evenWhenTouchBody();
-        this.eventWhenTouchEdge();
+        this.evenWhenTouchBody(); // sự kiện khi con rắn chạm vào thân của nó
+        this.eventWhenTouchEdge(); // sự kiện khi con rắn chạm vào các cạnh của màn hình chơi game
 
+        // kiểm tra rắn có chạm vào tường hay chưa ?
         if (this.checkTouchWall2()) {
             gameOver();
         }
 
-    } // -> con rắn tự động di chuyển ở Level 2 , 4, 5
+    } // -> con rắn tự động di chuyển ( dùng ở Level 2 , 4, 5 )
 
     moveSnake3() {
 
-        /*
-         khi con rắn di chuyển thực chất là ta sẽ xóa đi con rắn ở vị trí cũ,vẽ lại con rắn ở vị trí mới
-         */
-
         this.clearSnake();
 
         for (let i = this.bodySnake.length - 1; i > 0; i--) {
@@ -179,18 +184,24 @@ class Snake {
         this.bodySnake[0].y += currentDirectionSnake.y * BLOCK_SIZE;
 
         this.drawSnake();
-        this.evenWhenTouchBody();
-        this.eventWhenTouchEdge();
-        this.eventWhenTouchDoor();
+        this.evenWhenTouchBody(); // sự kiện khi con rắn chạm vào thân của nó
+        this.eventWhenTouchEdge(); // sự kiện khi con rắn chạm vào các cạnh màn hình chính của game
+        this.eventWhenTouchDoor(); // sự kiện khi con rắn chạm vào cánh cửa màu tím
 
+        // kiểm tra con rắn có chạm vào tường hay chưa ?
         if (this.checkTouchWall2()) {
             gameOver();
         }
 
-    } // -> con rắn tự động di chuyển ở Level 3
+    } // -> con rắn tự động di chuyển ( dùng ở Level 3)
 
     evenWhenTouchBody() {
 
+        /*
+            - b1: lấy ra phần đầu của con rắn
+            - b2: kiểm tra tọa độ phần đầu của con rắn với tất cả tọa độ phần thân của nó
+            - b3: nếu tọa độ phần đầu trùng với tọa độ phần thân thì game kết thúc
+         */
         let headSnake = this.bodySnake[0];
 
         for (let i = 1; i < this.bodySnake.length; i++) {
@@ -228,31 +239,35 @@ class Snake {
 
     eventWhenTouchDoor() {
 
+        /*
+            - b1 : lấy ra tọa độ phần đầu của con rắn
+            - b2 : kiểm tra tọa độ phần đầu của rắn có trùng với tọa độ của các cánh cửa hay không ?
+            - b3 : nếu tọa độ phần đầu của con rắn trùng với tọa độ của một trong các cánh cửa
+                   thì dịch chuyển con rắn sang vị trí của cánh cửa còn lại
+         */
+
         let headSnake = this.bodySnake[0];
         let arrDoor = door.arrDoor;
 
         if (arrDoor.length > 0) {
-
             // nếu đầu con rắn trùng tọa độ với cánh cửa thứ nhất
             if (headSnake.x === arrDoor[0].x && headSnake.y === arrDoor[0].y) {
 
+                // dịch chuyển con rắn sang cánh cửa thứ 2
                 headSnake.x = arrDoor[1].x;
                 headSnake.y = arrDoor[1].y;
                 door.arrDoor = [];
 
-
             }
-
             // nếu đầu con rắn trùng tọa độ với cánh cửa thứ 2
             else if (headSnake.x === arrDoor[1].x && headSnake.y === arrDoor[1].y) {
 
+                // dịch chuyển con rắn sang cánh cửa thứ nhất
                 headSnake.x = arrDoor[0].x;
                 headSnake.y = arrDoor[0].y;
                 door.arrDoor = [];
 
-
             }
-
         }
 
 
@@ -260,7 +275,13 @@ class Snake {
 
     checkTouchWall2() {
 
+        /*
+            - b1: lấy ra tọa độ phần đầu của con rắn
+            - b2: kiểm tra tọa độ phần đầu của rắn có trùng với tọa độ các chướng ngại vật (tường) hay không ?
+         */
+
         let headSnake = this.bodySnake[0];
+
         for (let wall of arrWall) {
             if (headSnake.x === wall.x && headSnake.y === wall.y) {
                 return true;
@@ -277,7 +298,8 @@ class Snake {
     } // -> kiểm tra rắn đã ăn mồi thành công hay chưa ?
 
     growUp() {
-        eat_food_sound.play();
+
+        eat_food_sound.play(); // -> phát ra âm thanh khi rắn ăn mồi thành công và lớn lên
 
         this.clearSnake();
         let partBodyLast = this.bodySnake[this.bodySnake.length - 1]; // phần cuối cùng của con rắn trước khi tăng trưởng
@@ -289,8 +311,9 @@ class Snake {
 
         let newPartBody = new Vector2D(newPartBodyX, newPartBodyY);
 
-        this.bodySnake.push(newPartBody);
+        this.bodySnake.push(newPartBody); // -> thêm tọa độ mới tìm được vào phần thân của con rắn
         this.drawSnake();
+
     }  // -> tăng độ dài cho con rắn
 
 
@@ -308,6 +331,14 @@ class Food {
         /*
          hàm Math.floor() sẽ làm tròn số -> trả về số nguyên gần nhất nhỏ hơn số truyền vào
          hàm Math.random() sẽ random ra các con số từ 0 - 1
+         */
+
+        /*
+            - b1 : random ra tọa độ chưa chính thức của food (x,y)
+            - b2 : kiểm tra tọa độ đó có trùng với tọa độ của con rắn hay không ?
+            - b3 :
+                  + nếu trùng sẽ chạy vòng lặp while , tiếp tục thực hiện lại b1 , b2
+                  + nếu không trùng thì tọa độ được random ở b1 chính là tọa độ chính thức
          */
 
         let checkWhile;
@@ -348,9 +379,6 @@ class Food {
         this.y = foodY;
 
         console.log('x:' + this.x, 'y:' + this.y);
-
-        // bug -> có trường hợp Food sẽ nằm trùng với vị trí của Snake
-
 
     } // -> tọa độ cùa food nằm ngẫu nhiên trên màn hình canvas , không được trùng với vị trí của con rắn
 
@@ -637,7 +665,7 @@ class Wall {
         arrWall.push(new Vector2D(this.x, this.y));
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
 
-    } // -> vị trí các tường mới không trùng với vị trí tường cũ
+    } // -> vị trí các tường mới không trùng với vị trí tường cũ và vị trí của con rắn
 
     randomWall() {
 
@@ -801,29 +829,28 @@ class Door {
         this.x = doorX;
         this.y = doorY;
 
-    } // -> tìm vị trí của 2 cánh cửa mới sao cho không trùng với vị trí của tường , rắn và thức ăn
-
+    } // -> tìm vị trí của cánh cửa mới sao cho không trùng với vị trí của tường, rắn và thức ăn
 
     drawRandomDoor() {
 
         context.fillStyle = COLOR_DOOR;
         this.randomDoor();
-        this.arrDoor.push(new Vector2D(this.x, this.y));
+        this.arrDoor.push(new Vector2D(this.x, this.y)); // thêm tọa độ cánh cửa được random vào danh sách các cánh cửa
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
         this.randomDoor();
         this.arrDoor.push(new Vector2D(this.x, this.y));
         context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
 
-    }// -> cánh cửa màu tím , khi con rắn chạm vào một trong 2 cánh cửa bất kì thì sẽ dịch chuyển đến cánh cửa còn lại
+    } // -> vẽ cánh cửa thần kỳ mới sao cho không trùng với vị trí của tường, thức ăn và con rắn
 
-    clearDoor() {
+    clearAllDoors() {
         context.fillStyle = COLOR_BACKGROUND;
         for (let door of this.arrDoor) {
             context.fillRect(door.x, door.y, BLOCK_SIZE, BLOCK_SIZE); // -> xóa trên giao diện canvas
         }
 
         this.arrDoor = []; // -> xóa toàn bộ phần tử trong mảng
-    }
+    } // -> xóa đi tất cả các cánh cửa thần kỳ
 
 }
 
@@ -869,7 +896,7 @@ class GameSnakeLevel3 {
 
     /*
     - Người chơi điều khiển con rắn ăn mồi và vượt qua các chướng ngại vật (tường)
-    - Con rắn sẽ di chuyển ngược hướng so với điều khiển của người chơi
+    - Khi người chơi điều khiển con rắn chạm vào cánh cửa màu tím thì con rắn sẽ dịch chuyển đến cánh cửa còn lại
     - Sau khi ăn mồi thành công thì con rắn sẽ lớn lên và điểm số sẽ tăng lên 1
     - Trò chơi kết thúc khi người chơi điều khiển con rắn chạm vào thân của nó hoặc là chạm vào tường
     */
@@ -934,6 +961,15 @@ class GameSnakeLevel5 {
 
 class GameSnakeLevel6 {
 
+    /*
+    - Người chơi điều khiển con rắn ăn mồi
+    - Con rắn sẽ di chuyển ngược hướng so với sự điều người của người chơi (vd : điều khiển con rắn lên trên thì nó sẽ đi xuống dưới ...)
+    - Sẽ có thêm tường cố định được sinh ra
+    - Sau khi ăn mồi thành công con rắn sẽ lớn lên và điểm số sẽ tăng lên 1
+    - Tường sẽ được tự động sinh ra sau khi rắn ăn mồi thành công
+    - Trò chơi kết thúc khi con rắn chạm vào thân của nó hoặc là chạm vào tường
+ */
+
     constructor() {
         wall = new Wall();
         snake = new Snake(11, 12, 13, 16);
@@ -968,9 +1004,9 @@ function runLevel1() {
             }
         }, TIME_OUT_LEVEL_1) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
 
-        keyBoardGame();
+        keyBoardGame(); // -> sự kiện bàn phím cho level
 
-        isRunLevel1 = true; // -> đánh dấu function này đã được thực thi
+        isRunLevel1 = true; // -> đảm bảo function này chỉ được thực hiện 1 lần
 
     }
 
@@ -998,9 +1034,9 @@ function runLevel2() {
 
         }, TIME_OUT_LEVEL_2);
 
-        keyBoardGame();
+        keyBoardGame(); // -> sự kiện bàn phím cho level
 
-        isRunLevel2 = true;
+        isRunLevel2 = true; // -> đảm bảo function này chỉ được thực hiện 1 lần
     }
 }
 
@@ -1030,28 +1066,28 @@ function runLevel3() {
 
             door.drawRandomDoor();
 
-        }, 20000);
+        }, 20000); // -> sau 20s sẽ xuất hiện 2 cánh cửa thần kỳ
 
         intervalRemoveDoor = setInterval(function () {
 
             if (door.arrDoor.length > 0) {
-                door.clearDoor();
+                door.clearAllDoors();
             }
 
-        }, 30000);
+        }, 30000); // -> sau 30s sẽ xóa đi tất cả các cánh cửa thần kỳ hiện có
 
         timeOutRemoveDoor = setTimeout(function () {
 
             if (door.arrDoor.length > 0) {
 
-                door.clearDoor();
+                door.clearAllDoors();
             }
 
-        }, 10000);
+        }, 10000); // -> 10s kể từ khi level bắt đầu , sẽ xóa đi tất cả các cánh cửa thần kì
 
-        keyBoardGame();
+        keyBoardGame(); // -> sự kiện bàn phím cho level
 
-        isRunLevel3 = true;
+        isRunLevel3 = true; // -> đảm bảo function này chỉ được thực hiện 1 lần
 
     }
 
@@ -1079,7 +1115,7 @@ function runLevel4() {
             TIME_OUT_LEVEL_4 -= 10;
         }, TIME_OUT_LEVEL_4)
 
-        keyBoardGame();
+        keyBoardGame(); // -> sự kiện bàn phím cho level
 
         isRunLevel4 = true; // -> giúp đảm bảo hàm này chỉ được gọi một lần duy nhất trong suốt thời gian chơi game
 
@@ -1108,7 +1144,7 @@ function runLevel5() {
 
         }, TIME_OUT_LEVEL_5)
 
-        keyBoardGame();
+        keyBoardGame(); // -> sự kiện bàn phím cho level
 
         isRunLevel5 = true;
     }
@@ -1137,7 +1173,7 @@ function runLevel6() {
 
         }, TIME_OUT_LEVEL_6);
 
-        keyBoardGameReverse();
+        keyBoardGameReverse(); // -> sự kiện bàn phím cho level
         isRunLevel6 = true;
     }
 
@@ -1185,7 +1221,7 @@ function keyBoardGame() {
         // console.log(e.keyCode)
     } // -> xử lí sự kiện khi con rắn di chuyển
 
-} // -> sự kiện bàn phím để chơi game ở tất cả các Level (trừ Level 3)
+} // -> sự kiện bàn phím để chơi game ở tất cả các Level (trừ Level 6)
 
 function keyBoardGameReverse() {
 
