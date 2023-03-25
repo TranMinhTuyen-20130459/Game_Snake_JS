@@ -1,15 +1,21 @@
 const BLOCK_SIZE = 25;
 const cols = 24;
 const rows = 20;
-const WIDTH_GAME = BLOCK_SIZE * cols;
-const HEIGHT_GAME = BLOCK_SIZE * rows;
-const canvas = document.getElementById('canvas-game');
-canvas.width = WIDTH_GAME , canvas.height = HEIGHT_GAME;
+/*
+    - chia màn hình chính thành 24 cột và 20 dòng
+    -> sẽ tạo thành 24 * 20 ô (mỗi ô có kích thước là 25)
+ */
 
-const COLOR_BACKGROUND = 'black';
-const COLOR_FOOD = 'yellow';
-const COLOR_DOOR = 'purple';
-const COLOR_WALL = 'red';
+const WIDTH_GAME = BLOCK_SIZE * cols; // -> chiều rộng của màn hình chính
+const HEIGHT_GAME = BLOCK_SIZE * rows; // -> chiều cao của màn hình chính
+
+const canvas = document.getElementById('canvas-game');
+canvas.width = WIDTH_GAME , canvas.height = HEIGHT_GAME; // set chiều rộng và chiều cao cho màn hình canvas
+
+const COLOR_BACKGROUND = 'black'; // -> Màn hình chính sẽ có nền màu đen
+const COLOR_FOOD = 'yellow'; // -> Mồi màu vàng
+const COLOR_DOOR = 'purple'; // -> Cánh cửa thần kỳ màu tím
+const COLOR_WALL = 'red'; // -> Tường màu đỏ
 
 const context = canvas.getContext('2d');
 context.fillStyle = COLOR_BACKGROUND
@@ -24,25 +30,25 @@ const D = 68;
 const W = 87;
 const S = 83;
 
-let snake;
-let food;
-let wall;
-let door;
+let snake; // con rắn
+let food; // thức ăn (mồi)
+let wall; // tường
+let door; // cánh cửa thần kỳ
 let currentDirectionSnake; // hướng hiện tại của con rắn theo hệ trục tọa độ x,y
-let score = 0;
+let score = 0; // điểm số trong một level bất kì
 let gameLevel;
-let intervalLevel;
+let intervalLevel; // dùng để chứa hàm setInterval
 let intervalDoor;
 let intervalRemoveDoor;
-let timeOutRemoveDoor;
-let gameOverLevel = false;
+let timeOutRemoveDoor; // dùng để chứa hàm setTimeOut
+let gameOverLevel = false; // dùng để xác định khi nào game sẽ kết thúc
 
 let TIME_OUT_LEVEL_1 = 175;
 let TIME_OUT_LEVEL_2 = 150;
 let TIME_OUT_LEVEL_3 = 150;
 let TIME_OUT_LEVEL_4 = 125;
 let TIME_OUT_LEVEL_5 = 125;
-let TIME_OUT_LEVEL_6 = 200;
+let TIME_OUT_LEVEL_6 = 125;
 
 let arrWall = []; // mảng các chướng ngại vật (tường)
 
@@ -52,6 +58,13 @@ let isRunLevel3 = false; // biến kiểm soát Game có đang chạy ở Level 
 let isRunLevel4 = false; // biến kiểm soát Game có đang chạy ở Level 4 hay không ?
 let isRunLevel5 = false; // biến kiểm soát Game có đang chạy ở Level 5 hay không ?
 let isRunLevel6 = false; // biến kiểm soát Game có đang chạy ở Level 6 hay không ?
+
+let score_lv1 = 0; // điểm số kỉ lục ở level 1
+let score_lv2 = 0; // điểm số kỉ lục ở level 2
+let score_lv3 = 0; // điểm số kỉ lục ở level 3
+let score_lv4 = 0; // điểm số kỉ lục ở level 4
+let score_lv5 = 0; // điểm số kỉ lục ở level 5
+let score_lv6 = 0; // điểm số kỉ lục ở level 6
 
 class Vector2D {
     constructor(x, y) {
@@ -256,7 +269,7 @@ class Snake {
                 // dịch chuyển con rắn sang cánh cửa thứ 2
                 headSnake.x = arrDoor[1].x;
                 headSnake.y = arrDoor[1].y;
-                door.arrDoor = [];
+                door.arrDoor = []; // cập nhật lại danh sách các cánh cửa thần kỳ
 
             }
             // nếu đầu con rắn trùng tọa độ với cánh cửa thứ 2
@@ -265,7 +278,7 @@ class Snake {
                 // dịch chuyển con rắn sang cánh cửa thứ nhất
                 headSnake.x = arrDoor[0].x;
                 headSnake.y = arrDoor[0].y;
-                door.arrDoor = [];
+                door.arrDoor = []; // cập nhật lại danh sách các cánh cửa thần kỳ
 
             }
         }
@@ -625,23 +638,25 @@ class Wall {
 
     drawWall6() {
 
-        for (let x = 0; x < WIDTH_GAME; x += BLOCK_SIZE) {
+        for (let y = 0; y < HEIGHT_GAME; y += BLOCK_SIZE) {
 
             context.fillStyle = COLOR_WALL;
-            context.fillRect(x, 0, BLOCK_SIZE, BLOCK_SIZE);
-            context.fillRect(x, HEIGHT_GAME - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(0, y, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(WIDTH_GAME - BLOCK_SIZE, y, BLOCK_SIZE, BLOCK_SIZE);
 
             // thêm vào danh sách các chướng ngại vật
-            arrWall.push(new Vector2D(x, 0), new Vector2D(x, HEIGHT_GAME - BLOCK_SIZE));
+            arrWall.push(new Vector2D(0, y), new Vector2D(WIDTH_GAME - BLOCK_SIZE, y));
 
         }
 
         for (let x = BLOCK_SIZE * 6; x < WIDTH_GAME - BLOCK_SIZE * 6; x += BLOCK_SIZE) {
 
             context.fillStyle = COLOR_WALL;
-            context.fillRect(x, BLOCK_SIZE * 4, BLOCK_SIZE, BLOCK_SIZE);
-            context.fillRect(x, BLOCK_SIZE * 5, BLOCK_SIZE, BLOCK_SIZE);
-            arrWall.push(new Vector2D(x, BLOCK_SIZE * 4), new Vector2D(x, BLOCK_SIZE * 5));
+            context.fillRect(x, BLOCK_SIZE * 13, BLOCK_SIZE, BLOCK_SIZE);
+            context.fillRect(x, BLOCK_SIZE * 14, BLOCK_SIZE, BLOCK_SIZE);
+
+            // thêm vào danh sách các chướng ngại vật
+            arrWall.push(new Vector2D(x, BLOCK_SIZE * 13), new Vector2D(x, BLOCK_SIZE * 14));
         }
 
         for (let y = BLOCK_SIZE * 5; y < HEIGHT_GAME - BLOCK_SIZE * 5; y += BLOCK_SIZE) {
@@ -650,9 +665,8 @@ class Wall {
             context.fillRect(BLOCK_SIZE * 11, y, BLOCK_SIZE, BLOCK_SIZE);
             context.fillRect(BLOCK_SIZE * 12, y, BLOCK_SIZE, BLOCK_SIZE);
 
+            // thêm vào danh sách các chướng ngại vật
             arrWall.push(new Vector2D(BLOCK_SIZE * 11, y), new Vector2D(BLOCK_SIZE * 12, y));
-
-
         }
 
 
@@ -989,7 +1003,10 @@ function runLevel1() {
     if (isRunLevel1 === false) { //-> nếu function này chưa được thực thi
 
         playDiv.style.display = "none"; // -> ẩn đi phần tử
-        bg_music.play();
+        bg_music.play(); // -> phát âm thanh nhạc nền game
+
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
 
         intervalLevel = setInterval(function () {
             snake.moveSnake1();
@@ -1001,6 +1018,10 @@ function runLevel1() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
+                if (score > score_lv1) {
+                    score_lv1 = score;
+                    score_level1.innerHTML = score_lv1;
+                } // -> cập nhật số điểm kỉ lục của level-1 lên giao diện
             }
         }, TIME_OUT_LEVEL_1) // -> hàm này giúp lặp lại một khối code sau khoảng thời gian chỉ định;
 
@@ -1019,6 +1040,9 @@ function runLevel2() {
         playDiv.style.display = "none"; // -> ẩn đi phần tử
         bg_music.play();
 
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
+
         intervalLevel = setInterval(function () {
             snake.moveSnake2();
             if (snake.checkEatFood(food)) {
@@ -1029,6 +1053,10 @@ function runLevel2() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
+                if (score > score_lv2) {
+                    score_lv2 = score;
+                    score_level2.innerHTML = score_lv2;
+                }// -> cập nhật số điểm kỉ lục của level-2 lên giao diện
                 TIME_OUT_LEVEL_2 -= 10;
             }
 
@@ -1047,6 +1075,9 @@ function runLevel3() {
         playDiv.style.display = 'none';
         bg_music.play();
 
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
+
         intervalLevel = setInterval(function () {
             snake.moveSnake3();
             if (snake.checkEatFood(food)) {
@@ -1057,6 +1088,10 @@ function runLevel3() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
+                if (score > score_lv3) {
+                    score_lv3 = score;
+                    score_level3.innerHTML = score_lv3;
+                }// -> cập nhật số điểm kỉ lục của level-3 lên giao diện
                 TIME_OUT_LEVEL_3 -= 20;
             }
 
@@ -1100,10 +1135,14 @@ function runLevel4() {
         playDiv.style.display = 'none';
         bg_music.play();
 
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
+
         intervalLevel = setInterval(function () {
             snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 4 giống cách di chuyển ở level 2
             if (snake.checkEatFood(food)) {
                 score++;
+                wall.drawWallRandom();
                 wall.drawWallRandom();
                 food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
                 snake.growUp();
@@ -1111,6 +1150,10 @@ function runLevel4() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
+                if (score > score_lv4) {
+                    score_lv4 = score;
+                    score_level4.innerHTML = score_lv4;
+                }// -> cập nhật số điểm kỉ lục của level-4 lên giao diện
             }
             TIME_OUT_LEVEL_4 -= 10;
         }, TIME_OUT_LEVEL_4)
@@ -1129,6 +1172,9 @@ function runLevel5() {
         playDiv.style.display = 'none';
         bg_music.play();
 
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
+
         intervalLevel = setInterval(function () {
             snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 5 giống cách di chuyển ở level 2
             if (snake.checkEatFood(food)) {
@@ -1140,6 +1186,10 @@ function runLevel5() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
+                if (score > score_lv5) {
+                    score_lv5 = score;
+                    score_level5.innerHTML = score_lv5;
+                }// -> cập nhật số điểm kỉ lục của level-5 lên giao diện
             }
 
         }, TIME_OUT_LEVEL_5)
@@ -1157,11 +1207,15 @@ function runLevel6() {
         playDiv.style.display = 'none';
         bg_music.play();
 
+        // Tạm thời ngăn chặn sự kiện click chuột
+        canvas.style.pointerEvents = "none";
+
         intervalLevel = setInterval(function () {
 
             snake.moveSnake2(); // -> cách di chuyển của con rắn ở level 6 giống cách di chuyển ở level 2
             if (snake.checkEatFood(food)) {
                 score++;
+                wall.drawWallRandom();
                 wall.drawWallRandom();
                 food.drawFoodLevel2(); // -> mồi mới được sinh ra sau khi ăn mồi cũ cũng giống ở level 2
                 snake.growUp();
@@ -1169,7 +1223,11 @@ function runLevel6() {
                 for (let element of scoreElements) {
                     element.innerHTML = score;
                 }
-            }
+                if (score > score_lv6) {
+                    score_lv6 = score;
+                    score_level6.innerHTML = score_lv6;
+                }
+            }// -> cập nhật số điểm kỉ lục của level-6 lên giao diện
 
         }, TIME_OUT_LEVEL_6);
 
@@ -1266,8 +1324,6 @@ function keyBoardGameReverse() {
     } // -> xử lí sự kiện khi con rắn di chuyển
 
 } // -> sự kiện bàn phím để chơi game Level 6
-
-
 
 
 

@@ -49,15 +49,44 @@ body {
 .right-game {
   flex: 0.5;
   background-color: #203c5b;
+}
+.right-game .score-level {
+  height: 30%;
+  background-color: #6a778c;
+  box-sizing: border-box;
+  border: 10px solid #04013e;
+  color: rgb(10, 10, 10);
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+.right-game .score-level span {
+  color: #c7b0c7;
+}
+.right-game .score-level .score-level-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.right-game .score-level .score-level-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.right-game .content-right {
   color: red;
+  margin-top: 50px;
+  height: 40%;
+}
+.right-game .content-right .title {
+  font-size: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.right-game .content-right {
-  font-size: 35px;
-}
 .right-game .content-right h1 {
+  font-size: 60px;
   display: flex;
   justify-content: center;
 }
