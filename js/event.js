@@ -1,4 +1,3 @@
-
 let bg_music = document.getElementById('bg-music'); // âm thanh nền của game
 let gov_sound = document.getElementById('game-over-sound'); // âm thanh khi game kết thúc
 let eat_food_sound = document.getElementById('eat-food-sound');  // âm thanh mỗi khi ăn mồi thành công
@@ -17,11 +16,11 @@ for (let div of divsClass) {
 
         div.addEventListener("click", function () {
 
-            resetCanvas();
-            new GameSnakeLevel1();
-            runLevel1();
-            resetColor(black_color);
-            changeColor(div, pink_color);
+            resetCanvas(); // Reset lại màn hình Canvas
+            new GameSnakeLevel1(); // -> khởi tạo game ở level 1
+            runLevel1(); // -> bắt đầu chạy game ở level 1
+            resetColor(black_color); // -> reset lại màu của các thẻ div có class là level-game bên trái của màn hình chơi game
+            changeColor(div, pink_color); // -> đổi màu của thẻ div có class là level-game và nội dung là Level 1
         })
 
     } else if (contentHTML == 'Level 2') {
@@ -126,9 +125,9 @@ function resetCanvas() {
     TIME_OUT_LEVEL_1 = 175;
     TIME_OUT_LEVEL_2 = 150;
     TIME_OUT_LEVEL_3 = 150;
-    TIME_OUT_LEVEL_4 = 150;
+    TIME_OUT_LEVEL_4 = 125;
     TIME_OUT_LEVEL_5 = 125;
-    TIME_OUT_LEVEL_6 = 200;
+    TIME_OUT_LEVEL_6 = 125;
 
     gameOverLevel = false;
     arrWall = []; // -> reset lại mảng các chướng ngại vật (tường)
@@ -172,4 +171,13 @@ window.addEventListener('load', function () {
         runLevel1();
     }
 }) // -> hàm này được gọi khi trang vừa được load
+
+
+let score_level1 = document.getElementById('score-level1'); // lấy ra thẻ có id là score-level1 -> đây là thẻ chứa điểm số kỉ lục ở level-1
+let score_level2 = document.getElementById('score-level2'); // lấy ra thẻ có id là score-level2 -> đây là thẻ chứa điểm số kỉ lục ở level-2
+let score_level3 = document.getElementById('score-level3'); // lấy ra thẻ có id là score-level3 -> đây là thẻ chứa điểm số kỉ lục ở level-3
+let score_level4 = document.getElementById('score-level4'); // lấy ra thẻ có id là score-level4 -> đây là thẻ chứa điểm số kỉ lục ở level-4
+let score_level5 = document.getElementById('score-level5'); // lấy ra thẻ có id là score-level5 -> đây là thẻ chứa điểm số kỉ lục ở level-5
+let score_level6 = document.getElementById('score-level6'); // lấy ra thẻ có id là score-level6 -> đây là thẻ chứa điểm số kỉ lục ở level-6
+
 

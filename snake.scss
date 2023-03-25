@@ -1,12 +1,13 @@
-
 $color-left-right: #203c5b; /* Màu áp dụng cho thẻ div ở bên trái và bên phải của game */
-$pink-color: #a10f43;
+$pink-color: #a10f43; // màu hồng
 
+// Thiết lập các thuộc tính cho phần thân của trang web
 body {
   font-family: Arial;
   cursor: pointer; /* Thay đổi con trỏ chuột thành hình nút bấm */
 }
 
+// Thiết lập kích thước, vị trí và màu sắc của khung container chứa các thành phần của game
 .container {
   width: 1210px;
   height: 510px;
@@ -16,6 +17,7 @@ body {
   background-color: #ffffff;
 }
 
+// Thiết lập kích thước, vị trí và màu sắc của phần bên trái của game
 .left-game {
   flex: 0.5;
   background-color: $color-left-right;
@@ -34,16 +36,19 @@ body {
     color: antiquewhite;
   }
 
+  // Thiết lập màu sắc khi hover vào từng level trong game
   .level-game:hover {
     background-color: $pink-color;
   }
 
 }
 
+// Thiết lập kích thước, vị trí và màu sắc của phần chứa màn hình Canvas
 .main-game {
   flex: 1;
   border: 5px solid #1b9b78;
 
+  // Thiết lập vị trí cho phần cha và con trong game
   .parent {
     position: relative;
   }
@@ -54,19 +59,57 @@ body {
 
 }
 
+// Thiết lập kích thước, vị trí và màu sắc của phần bên phải của game
 .right-game {
   flex: 0.5;
   background-color: $color-left-right;
 
-  color: red;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // Thiết lập kích thước, vị trí và màu sắc của bảng điểm kỉ lục trong game
+  .score-level {
+    height: 30%;
+    background-color: #6a778c;
+    box-sizing: border-box;
+    border: 10px solid #04013e;
+    color: rgb(10 10 10);
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-around;
 
+    span {
+      color: #c7b0c7;
+    }
+
+    .score-level-left {
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    .score-level-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+  }
+
+  // Thiết lập kích thước, vị trí và màu sắc của phần điểm sẽ hiển thị mỗi khi rắn ăn mồi
   .content-right {
-    font-size: 35px;
+    color: red;
+    margin-top: 50px;
+    height: 40%;
+
+    .title {
+      font-size: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
     h1 {
+      font-size: 60px;
       display: flex;
       justify-content: center;
     }
@@ -75,10 +118,12 @@ body {
 
 }
 
+// Thiết lập vị trí của màn hình Canvas
 #canvas-game {
   z-index: 0;
 }
 
+// Thiết lập kích thước, vị trí và màu sắc của button Play
 #play-div {
   z-index: 1;
   top: 50%;
